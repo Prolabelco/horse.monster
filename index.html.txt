@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horse Racing Handicapping Calculator</title>
+    <style>
+        :root {
+            --primary: #0074d9;
+            --primary-light: #b3d9ff;
+            --success: #2ecc40;
+            --danger: #ff4136;
+            --warning: #ffdc00;
+            --gray-light: #f8f9fa;
+            --gray: #adb5bd;
+            --gray-dark: #343a40;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            background-color: #f4f6f9;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        
+        .import-section {
+            padding: 15px 20px;
+            background-color: var(--primary-light);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            border: 1px solid transparent;
+            padding: 8px 16px;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            color: #fff;
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        .btn-success {
+            color: #fff;
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .sidebar {
+            flex: 0 0 100%;
+            padding: 20px;
+            background-color: var(--gray-light);
+            border-right: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .content {
+            flex: 0 0 100%;
+            padding: 20px;
+        }
+        
+        @media (min-width: 992px) {
+            .sidebar {
+                flex: 0 0 35%;
+            }
+            
+            .content {
+                flex: 0 0 65%;
+            }
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            padding: 12px 15px;
+            background-color: rgba(0,0,0,0.03);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            transition: border-color 0.15s ease-in-out;
+        }
+        
+        .range-slider {
+            display: flex;
+            align-items: center;
+        }
+        
+        .range-slider input[type="range"] {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        
+        .range-slider input[type="number"] {
+            width: 60px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            border-bottom: 1px solid var(--gray);
+            padding-left: 0;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+        
+        .nav-tabs li {
+            margin-bottom: -1px;
+        }
+        
+        .nav-tabs a {
+            display: block;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: var(--gray-dark);
+            border: 1px solid transparent;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            white-space: nowrap;
+        }
+        
+        .nav-tabs a.active {
+            color: var(--primary);
+            background-color: #fff;
+            border-color: var(--gray) var(--gray) #fff;
+        }
+        
+        .tab-content {
+            padding: 15px 0;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        th {
+            background-color: var(--gray-light);
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: rgba(0,0,0,0.02);
+        }
+        
+        .progress {
+            height: 8px;
+            background-color: var(--gray-light);
+            border-radius: 4px;
+            margin-bottom: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-item input {
+            margin-right: 5px;
+        }
+        
+        .radio-group {
+            margin-bottom: 15px;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .radio-item input {
+            margin-right: 5px;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+        
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        
+        .badge-success {
+            color: #fff;
+            background-color: var(--success);
+        }
+        
+        .badge-warning {
+            color: #212529;
+            background-color: var(--warning);
+        }
+        
+        .badge-danger {
+            color: #fff;
+            background-color: var(--danger);
+        }
+        
+        .text-success {
+            color: var(--success);
+        }
+        
+        .text-danger {
+            color: var(--danger);
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .font-weight-bold {
+            font-weight: 700;
+        }
+        
+        .mb-0 {
+            margin-bottom: 0;
+        }
+        
+        .mt-3 {
+            margin-top: 15px;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Mock Chart Styling */
+        .mock-bar-chart {
+            width: 100%;
+            height: 250px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            background-color: #fff;
+            border: 1px solid #e9ecef;
+            padding: 15px 10px 30px 10px;
+            position: relative;
+        }
+        
+        .bar {
+            flex: 1;
+            margin: 0 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .bar-fill {
+            width: 100%;
+            background-color: var(--primary);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+        }
+        
+        .bar-fill::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+        
+        .bar-label {
+            font-size: 0.75rem;
+            margin-top: 5px;
+            text-align: center;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* Mock Radar Chart */
+        .mock-radar-chart {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #fff;
+            border: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .radar-web {
+            width: 80%;
+            height: 80%;
+            position: relative;
+        }
+        
+        .radar-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px dashed #adb5bd;
+        }
+        
+        .radar-circle-1 {
+            width: 25%;
+            height: 25%;
+        }
+        
+        .radar-circle-2 {
+            width: 50%;
+            height: 50%;
+        }
+        
+        .radar-circle-3 {
+            width: 75%;
+            height: 75%;
+        }
+        
+        .radar-circle-4 {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .radar-axis {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 1px;
+            background-color: #adb5bd;
+            transform-origin: left center;
+        }
+        
+        .radar-axis:nth-child(1) {
+            transform: translate(0, -50%) rotate(0deg);
+        }
+        
+        .radar-axis:nth-child(2) {
+            transform: translate(0, -50%) rotate(45deg);
+        }
+        
+        .radar-axis:nth-child(3) {
+            transform: translate(0, -50%) rotate(90deg);
+        }
+        
+        .radar-axis:nth-child(4) {
+            transform: translate(0, -50%) rotate(135deg);
+        }
+        
+        .radar-axis:nth-child(5) {
+            transform: translate(0, -50%) rotate(180deg);
+        }
+        
+        .radar-axis:nth-child(6) {
+            transform: translate(0, -50%) rotate(225deg);
+        }
+        
+        .radar-axis:nth-child(7) {
+            transform: translate(0, -50%) rotate(270deg);
+        }
+        
+        .radar-axis:nth-child(8) {
+            transform: translate(0, -50%) rotate(315deg);
+        }
+        
+        .radar-label {
+            position: absolute;
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+        
+        .label-0 {
+            top: 50%;
+            left: 100%;
+            transform: translate(10px, -50%);
+        }
+        
+        .label-1 {
+            top: 15%;
+            right: 15%;
+            transform: translate(0, 0);
+        }
+        
+        .label-2 {
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -10px);
+        }
+        
+        .label-3 {
+            top: 15%;
+            left: 15%;
+            transform: translate(0, 0);
+        }
+        
+        .label-4 {
+            top: 50%;
+            left: 0;
+            transform: translate(-10px, -50%);
+        }
+        
+        .label-5 {
+            bottom: 15%;
+            left: 15%;
+            transform: translate(0, 0);
+        }
+        
+        .label-6 {
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%, 10px);
+        }
+        
+        .label-7 {
+            bottom: 15%;
+            right: 15%;
+            transform: translate(0, 0);
+        }
+        
+        .radar-data {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 50%, 85% 30%, 70% 10%, 50% 15%, 30% 10%, 15% 30%, 25% 60%, 50% 80%, 75% 60%);
+        }
+        
+        .radar-data-1 {
+            background-color: rgba(0, 116, 217, 0.5);
+            clip-path: polygon(50% 50%, 90% 35%, 80% 15%, 50% 20%, 20% 15%, 10% 35%, 20% 70%, 50% 85%, 80% 70%);
+        }
+        
+        .radar-data-2 {
+            background-color: rgba(46, 204, 64, 0.5);
+            clip-path: polygon(50% 50%, 80% 30%, 70% 10%, 50% 25%, 30% 10%, 20% 30%, 30% 60%, 50% 70%, 70% 60%);
+        }
+        
+        .radar-data-3 {
+            background-color: rgba(255, 65, 54, 0.5);
+            clip-path: polygon(50% 50%, 75% 40%, 65% 20%, 50% 30%, 35% 20%, 25% 40%, 35% 55%, 50% 65%, 65% 55%);
+        }
+        
+        /* Race track visualization */
+        .race-track {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .finish-line {
+            position: absolute;
+            top: 0;
+            right: 20%;
+            width: 4px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                #000,
+                #000 10px,
+                #fff 10px,
+                #fff 20px
+            );
+            z-index: 2;
+        }
+        
+        .horse-position {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 3;
+        }
+        
+        /* Form controls interactivity */
+        select, input, button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Horse Racing Handicapping Calculator</h1>
+        </header>
+        
+        <div class="import-section">
+            <button class="btn btn-primary" id="importBtn">Import Race Data</button>
+            <button class="btn btn-success" id="sampleBtn">Load Sample Data</button>
+            <span id="dataStatus" style="margin-left: 10px; color: green; font-weight: 600; display: none;">6 horses loaded from Churchill Downs</span>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <!-- Race Conditions -->
+                <div class="card">
+                    <div class="card-header">Race Conditions</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="surface-type">Surface Type:</label>
+                            <select id="surface-type" class="form-control">
+                                <option selected>Dirt</option>
+                                <option>Turf</option>
+                                <option>Synthetic</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="track-condition">Track Condition:</label>
+                            <select id="track-condition" class="form-control">
+                                <option selected>Fast</option>
+                                <option>Good</option>
+                                <option>Muddy</option>
+                                <option>Sloppy</option>
+                                <option>Slow</option>
+                                <option>Firm</option>
+                                <option>Good to Firm</option>
+                                <option>Good to Soft</option>
+                                <option>Soft</option>
+                                <option>Heavy</option>
+                                <option>Yielding</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="distance">Distance (furlongs):</label>
+                            <input type="number" id="distance" class="form-control" value="8.5" step="0.5" min="2" max="16">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="class">Class:</label>
+                            <select id="class" class="form-control">
+                                <option>Grade 1</option>
+                                <option>Grade 2</option>
+                                <option>Grade 3</option>
+                                <option>Listed</option>
+                                <option selected>Allowance</option>
+                                <option>Optional Claiming</option>
+                                <option>Claiming</option>
+                                <option>Maiden Special Weight</option>
+                                <option>Maiden Claiming</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="race-date">Race Date:</label>
+                            <input type="date" id="race-date" class="form-control" value="2025-04-30">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="track-bias">Track Bias:</label>
+                            <select id="track-bias" class="form-control">
+                                <option value="none" selected>No Bias</option>
+                                <option value="inside">Inside Favored</option>
+                                <option value="outside">Outside Favored</option>
+                                <option value="speed">Speed Favored</option>
+                                <option value="closers">Closers Favored</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Handicapping Factors -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>Handicapping Factor Weights</span>
+                        <span class="text-success" id="totalPercentage">Total: 100%</span>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <div>
+                                <span style="font-size: 0.9rem;">Active Profile: Default</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm" id="resetBtn" style="background-color: #f8f9fa; font-size: 0.8rem; padding: 4px 8px;">Reset to Default</button>
+                                <button class="btn btn-sm" id="saveProfileBtn" style="background-color: #e3f2fd; font-size: 0.8rem; padding: 4px 8px;">Save Profile</button>
+                            </div>
+                        </div>
+                        
+                        <!-- HIGH IMPACT FACTORS (30%) -->
+                        <div style="margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #eee;">
+                            <div style="font-weight: 600; color: #0074d9; margin-bottom: 5px;">High Impact Factors (30%)</div>
+                            
+                            <div class="form-group">
+                                <label>Speed Figures:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="10" data-factor="speed">
+                                    <input type="number" class="factor-value" value="10" min="0" max="50" data-factor="speed">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Class:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="8" data-factor="class">
+                                    <input type="number" class="factor-value" value="8" min="0" max="50" data-factor="class">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Recent Form:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="7" data-factor="form">
+                                    <input type="number" class="factor-value" value="7" min="0" max="50" data-factor="form">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Distance/Surface:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="5" data-factor="distance">
+                                    <input type="number" class="factor-value" value="5" min="0" max="50" data-factor="distance">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- MEDIUM IMPACT FACTORS (40%) -->
+                        <div style="margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #eee;">
+                            <div style="font-weight: 600; color: #2ecc40; margin-bottom: 5px;">Medium Impact Factors (40%)</div>
+                            
+                            <div class="form-group">
+                                <label>Connections (Jockey/Trainer):</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="10" data-factor="connections">
+                                    <input type="number" class="factor-value" value="10" min="0" max="50" data-factor="connections">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Pace Compatibility:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="8" data-factor="pace">
+                                    <input type="number" class="factor-value" value="8" min="0" max="50" data-factor="pace">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Workouts:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="8" data-factor="workouts">
+                                    <input type="number" class="factor-value" value="8" min="0" max="50" data-factor="workouts">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Weight Carried:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="7" data-factor="weight">
+                                    <input type="number" class="factor-value" value="7" min="0" max="50" data-factor="weight">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Post Position:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="7" data-factor="post">
+                                    <input type="number" class="factor-value" value="7" min="0" max="50" data-factor="post">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- SUPPORTING FACTORS (30%) -->
+                        <div>
+                            <div style="font-weight: 600; color: #ff851b; margin-bottom: 5px;">Supporting Factors (30%)</div>
+                            
+                            <div class="form-group">
+                                <label>Equipment Changes:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="7" data-factor="equipment">
+                                    <input type="number" class="factor-value" value="7" min="0" max="50" data-factor="equipment">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Medication:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="5" data-factor="medication">
+                                    <input type="number" class="factor-value" value="5" min="0" max="50" data-factor="medication">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Layoff Pattern:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="5" data-factor="layoff">
+                                    <input type="number" class="factor-value" value="5" min="0" max="50" data-factor="layoff">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Pedigree:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="5" data-factor="pedigree">
+                                    <input type="number" class="factor-value" value="5" min="0" max="50" data-factor="pedigree">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Age/Development:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="4" data-factor="age">
+                                    <input type="number" class="factor-value" value="4" min="0" max="50" data-factor="age">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Track Condition Preference:</label>
+                                <div class="range-slider">
+                                    <input type="range" class="factor-slider" min="0" max="50" value="4" data-factor="condition">
+                                    <input type="number" class="factor-value" value="4" min="0" max="50" data-factor="condition">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monte Carlo Settings -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>Monte Carlo Simulation Settings</span>
+                        <button class="btn btn-sm" id="resetSimBtn" style="background-color: #f8f9fa; font-size: 0.8rem; padding: 4px 8px;">Reset to Realistic Defaults</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="num-simulations">Number of Simulations:</label>
+                            <input type="number" id="num-simulations" class="form-control" value="10000" step="1000" min="1000" max="50000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="random-factor">Random Factor Sensitivity:</label>
+                            <input type="range" id="random-factor" min="0" max="1" value="0.5" step="0.1" style="width: 100%;">
+                            <div class="text-center" id="random-factor-value">0.5</div>
+                        </div>
+                        
+                        <details>
+                            <summary style="cursor: pointer; margin-bottom: 10px;">Advanced Random Factors</summary>
+                            <div style="padding: 10px; background-color: #f8f9fa; border-radius: 4px;">
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label style="font-size: 0.8rem;">Traffic Issues:</label>
+                                        <input type="range" class="adv-factor" min="0" max="1" value="0.3" step="0.05" style="width: 100%;" data-factor="traffic">
+                                        <div class="text-center" style="font-size: 0.8rem;" id="traffic-value">30%</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label style="font-size: 0.8rem;">Jockey Errors:</label>
+                                        <input type="range" class="adv-factor" min="0" max="1" value="0.2" step="0.05" style="width: 100%;" data-factor="jockey">
+                                        <div class="text-center" style="font-size: 0.8rem;" id="jockey-value">20%</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label style="font-size: 0.8rem;">Gate Issues:</label>
+                                        <input type="range" class="adv-factor" min="0" max="1" value="0.15" step="0.05" style="width: 100%;" data-factor="gate">
+                                        <div class="text-center" style="font-size: 0.8rem;" id="gate-value">15%</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label style="font-size: 0.8rem;">Horse Behavior:</label>
+                                        <input type="range" class="adv-factor" min="0" max="1" value="0.1" step="0.05" style="width: 100%;" data-factor="behavior">
+                                        <div class="text-center" style="font-size: 0.8rem;" id="behavior-value">10%</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label style="font-size: 0.8rem;">Weather Impact:</label>
+                                        <input type="range" class="adv-factor" min="0" max="1" value="0.05" step="0.05" style="width: 100%;" data-factor="weather">
+                                        <div class="text-center" style="font-size: 0.8rem;" id="weather-value">5%</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label style="font-size: 0.8rem;">Track Variations:</label>
+                                        <input type="range" class="adv-factor" min="0" max="1" value="0.2" step="0.05" style="width: 100%;" data-factor="track">
+                                        <div class="text-center" style="font-size: 0.8rem;" id="track-value">20%</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label style="font-size: 0.8rem;">Energy Distribution:</label>
+                                        <input type="range" class="adv-factor" min="0" max="1" value="0.15" step="0.05" style="width: 100%;" data-factor="energy">
+                                        <div class="text-center" style="font-size: 0.8rem;" id="energy-value">15%</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label style="font-size: 0.8rem;">Luck Factor:</label>
+                                        <input type="range" class="adv-factor" min="0" max="1" value="0.1" step="0.05" style="width: 100%;" data-factor="luck">
+                                        <div class="text-center" style="font-size: 0.8rem;" id="luck-value">10%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
+                        
+                        <button class="btn btn-success" id="runSimBtn" style="width: 100%; margin-top: 10px;">Run Monte Carlo Simulation</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div id="tabSystem">
+                    <ul class="nav-tabs">
+                        <li><a href="#tab1" class="tab-link link1 active" data-tab="tab1">Win Probabilities</a></li>
+                        <li><a href="#tab2" class="tab-link link2" data-tab="tab2">Exacta/Trifecta</a></li>
+                        <li><a href="#tab3" class="tab-link link3" data-tab="tab3">Factor Analysis</a></li>
+                        <li><a href="#tab4" class="tab-link link4" data-tab="tab4">Comparisons</a></li>
+                        <li><a href="#tab5" class="tab-link link5" data-tab="tab5">Betting Calculator</a></li>
+                        <li><a href="#tab6" class="tab-link link6" data-tab="tab6">Actual Results</a></li>
+                    </ul>
+                    
+                    <div class="tab-content">
+                        <!-- Win Probabilities Tab -->
+                        <div id="tab1" class="tab-pane active">
+                            <div class="card">
+                                <div class="card-header">Simulation Results</div>
+                                <div class="card-body">
+                                    <div id="win-probability-table">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Horse</th>
+                                                    <th>Win %</th>
+                                                    <th>Avg. Finish</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="font-weight-bold">Royal Flush</td>
+                                                    <td class="text-center">29.6%</td>
+                                                    <td class="text-center">2.16</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-bold">Mountain King</td>
+                                                    <td class="text-center">24.3%</td>
+                                                    <td class="text-center">2.38</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-bold">Speedy Thunder</td>
+                                                    <td class="text-center">19.8%</td>
+                                                    <td class="text-center">2.67</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-bold">Lucky Star</td>
+                                                    <td class="text-center">15.4%</td>
+                                                    <td class="text-center">3.21</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-bold">Night Runner</td>
+                                                    <td class="text-center">6.5%</td>
+                                                    <td class="text-center">4.27</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-bold">Silver Streak</td>
+                                                    <td class="text-center">4.4%</td>
+                                                    <td class="text-center">4.83</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="chart-container">
+                                        <div class="mock-bar-chart" id="win-probability-chart">
+                                            <div class="bar">
+                                                <div class="bar-fill" style="height: 90%" data-value="29.6%"></div>
+                                                <div class="bar-label">Royal Flush</div>
+                                            </div>
+                                            <div class="bar">
+                                                <div class="bar-fill" style="height: 75%" data-value="24.3%"></div>
+                                                <div class="bar-label">Mountain King</div>
+                                            </div>
+                                            <div class="bar">
+                                                <div class="bar-fill" style="height: 60%" data-value="19.8%"></div>
+                                                <div class="bar-label">Speedy Thunder</div>
+                                            </div>
+                                            <div class="bar">
+                                                <div class="bar-fill" style="height: 45%" data-value="15.4%"></div>
+                                                <div class="bar-label">Lucky Star</div>
+                                            </div>
+                                            <div class="bar">
+                                                <div class="bar-fill" style="height: 20%" data-value="6.5%"></div>
+                                                <div class="bar-label">Night Runner</div>
+                                            </div>
+                                            <div class="bar">
+                                                <div class="bar-fill" style="height: 15%" data-value="4.4%"></div>
+                                                <div class="bar-label">Silver Streak</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center" style="font-size: 0.9rem; color: #6c757d;">
+                                        Based on <span id="simulation-count">10,000</span> simulated races with random factor sensitivity of <span id="sensitivity-value">0.5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Exacta/Trifecta Tab -->
+                        <div id="tab2" class="tab-pane">
+                            <div class="card">
+                                <div class="card-header">Exotic Wager Probabilities</div>
+                                <div class="card-body">
+                                    <div class="grid-2">
+                                        <div>
+                                            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 10px;">Top Exacta Combinations</h4>
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Combination</th>
+                                                        <th>Probability</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Royal Flush - Mountain King</td>
+                                                        <td>14.3%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Mountain King - Royal Flush</td>
+                                                        <td>12.7%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Royal Flush - Speedy Thunder</td>
+                                                        <td>8.6%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Speedy Thunder - Royal Flush</td>
+                                                        <td>6.5%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Mountain King - Speedy Thunder</td>
+                                                        <td>6.2%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Speedy Thunder - Mountain King</td>
+                                                        <td>5.8%</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 10px;">Top Trifecta Combinations</h4>
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Combination</th>
+                                                        <th>Probability</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Royal Flush - Mountain King - Speedy Thunder</td>
+                                                        <td>6.8%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Mountain King - Royal Flush - Speedy Thunder</td>
+                                                        <td>5.9%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Royal Flush - Speedy Thunder - Mountain King</td>
+                                                        <td>4.7%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Mountain King - Speedy Thunder - Royal Flush</td>
+                                                        <td>4.1%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Royal Flush - Mountain King - Lucky Star</td>
+                                                        <td>3.2%</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid-2 mt-3">
+                                        <div class="card">
+                                            <div class="card-header">Exacta Key Horses</div>
+                                            <div class="card-body">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Horse</th>
+                                                            <th>1st or 2nd %</th>
+                                                            <th>Key Confidence</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Royal Flush</td>
+                                                            <td>58.7%</td>
+                                                            <td><span class="badge badge-success">High</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Mountain King</td>
+                                                            <td>52.3%</td>
+                                                            <td><span class="badge badge-success">High</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Speedy Thunder</td>
+                                                            <td>44.1%</td>
+                                                            <td><span class="badge badge-warning">Medium</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Lucky Star</td>
+                                                            <td>28.6%</td>
+                                                            <td><span class="badge badge-warning">Medium</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="card">
+                                            <div class="card-header">Recommended Exotic Strategies</div>
+                                            <div class="card-body">
+                                                <div style="margin-bottom: 10px;">
+                                                    <div style="font-weight: 600;">Exacta Strategy:</div>
+                                                    <p>Royal Flush and Mountain King keyed in 1st with next 3 horses in 2nd</p>
+                                                </div>
+                                                
+                                                <div style="margin-bottom: 10px;">
+                                                    <div style="font-weight: 600;">Trifecta Strategy:</div>
+                                                    <p>Royal Flush keyed in 1st with Mountain King, Speedy Thunder, Lucky Star in 2nd/3rd</p>
+                                                </div>
+                                                
+                                                <div style="font-weight: 600;">Cost Estimates:</div>
+                                                <ul style="list-style: none; padding-left: 0; margin-top: 5px;">
+                                                    <li>$1 Exacta Box (top 3): $6</li>
+                                                    <li>$1 Trifecta Key: $6</li>
+                                                    <li>50¢ Trifecta Box (top 4): $12</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Factor Analysis Tab -->
+                        <div id="tab3" class="tab-pane">
+                            <div class="card">
+                                <div class="card-header">Individual Horse Analysis</div>
+                                <div class="card-body">
+                                    <div style="margin-bottom: 15px;">
+                                        <label for="horse-select" style="display: block; margin-bottom: 5px; font-weight: 500;">Select Horse:</label>
+                                        <select id="horse-select" class="form-control">
+                                            <option>Royal Flush</option>
+                                            <option>Mountain King</option>
+                                            <option>Speedy Thunder</option>
+                                            <option>Lucky Star</option>
+                                            <option>Night Runner</option>
+                                            <option>Silver Streak</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="grid-2">
+                                        <div>
+                                            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 10px;">Factor Strengths</h4>
+                                            <table id="factor-strengths">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Factor</th>
+                                                        <th>Score</th>
+                                                        <th>Weight</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Speed Figures</td>
+                                                        <td>
+                                                            <div class="progress">
+                                                                <div class="progress-bar" style="width: 87%;"></div>
+                                                            </div>
+                                                            <div class="text-right">87</div>
+                                                        </td>
+                                                        <td>10%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Class</td>
+                                                        <td>
+                                                            <div class="progress">
+                                                                <div class="progress-bar" style="width: 92%;"></div>
+                                                            </div>
+                                                            <div class="text-right">92</div>
+                                                        </td>
+                                                        <td>8%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Recent Form</td>
+                                                        <td>
+                                                            <div class="progress">
+                                                                <div class="progress-bar" style="width: 85%;"></div>
+                                                            </div>
+                                                            <div class="text-right">85</div>
+                                                        </td>
+                                                        <td>7%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Distance</td>
+                                                        <td>
+                                                            <div class="progress">
+                                                                <div class="progress-bar" style="width: 78%;"></div>
+                                                            </div>
+                                                            <div class="text-right">78</div>
+                                                        </td>
+                                                        <td>5%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Pace</td>
+                                                        <td>
+                                                            <div class="progress">
+                                                                <div class="progress-bar" style="width: 74%;"></div>
+                                                            </div>
+                                                            <div class="text-right">74</div>
+                                                        </td>
+                                                        <td>8%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Jockey</td>
+                                                        <td>
+                                                            <div class="progress">
+                                                                <div class="progress-bar" style="width: 90%;"></div>
+                                                            </div>
+                                                            <div class="text-right">90</div>
+                                                        </td>
+                                                        <td>5%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Trainer</td>
+                                                        <td>
+                                                            <div class="progress">
+                                                                <div class="progress-bar" style="width: 88%;"></div>
+                                                            </div>
+                                                            <div class="text-right">88</div>
+                                                        </td>
+                                                        <td>5%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Track Condition</td>
+                                                        <td>
+                                                            <div class="progress">
+                                                                <div class="progress-bar" style="width: 82%;"></div>
+                                                            </div>
+                                                            <div class="text-right">82</div>
+                                                        </td>
+                                                        <td>4%</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 10px;">Race Specifics</h4>
+                                            
+                                            <div class="card" style="margin-bottom: 10px;">
+                                                <div class="card-header">Distance Aptitude</div>
+                                                <div class="card-body">
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                                        <span>Sprint Performance:</span>
+                                                        <span>82 (4 races)</span>
+                                                    </div>
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                                        <span>Middle Distance:</span>
+                                                        <span>90 (3 races)</span>
+                                                    </div>
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                                        <span>Route Performance:</span>
+                                                        <span>75 (1 race)</span>
+                                                    </div>
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 600;">
+                                                        <span>Today's Distance:</span>
+                                                        <span>87 points</span>
+                                                    </div>
+                                                    <div style="margin-top: 10px; font-style: italic; font-size: 0.85rem;">
+                                                        Pattern: Improving at middle distances
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="card">
+                                                <div class="card-header">Pace Analysis</div>
+                                                <div class="card-body">
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                                        <span>Running Style:</span>
+                                                        <span>Stalker/Presser</span>
+                                                    </div>
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                                        <span>Early Speed:</span>
+                                                        <span>74 points</span>
+                                                    </div>
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                                        <span>Late Pace:</span>
+                                                        <span>85 points</span>
+                                                    </div>
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 600;">
+                                                        <span>Pace Compatibility:</span>
+                                                        <span>Strong</span>
+                                                    </div>
+                                                    <div style="margin-top: 10px; font-style: italic; font-size: 0.85rem;">
+                                                        Note: Well suited for expected moderate pace
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card mt-3">
+                                        <div class="card-header">Performance Patterns</div>
+                                        <div class="card-body">
+                                            <div class="grid-2">
+                                                <div>
+                                                    <h4 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 5px;">Recent Races</h4>
+                                                    <table>
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Distance</th>
+                                                                <th>Position</th>
+                                                                <th>Speed Fig</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>04/01/25</td>
+                                                                <td>8.5f</td>
+                                                                <td>1st</td>
+                                                                <td>95</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>03/05/25</td>
+                                                                <td>8.0f</td>
+                                                                <td>2nd</td>
+                                                                <td>94</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>02/15/25</td>
+                                                                <td>7.5f</td>
+                                                                <td>1st</td>
+                                                                <td>92</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                
+                                                <div>
+                                                    <h4 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 5px;">Form Cycle</h4>
+                                                    <div style="margin-bottom: 10px;">
+                                                        <div style="font-weight: 500;">Trend Analysis:</div>
+                                                        <p style="margin-top: 0;">Currently in peak form with consistent improvement</p>
+                                                    </div>
+                                                    <div>
+                                                        <div style="font-weight: 500;">Key Indicators:</div>
+                                                        <ul style="margin-top: 0; padding-left: 20px;">
+                                                            <li>Speed figures trending upward</li>
+                                                            <li>Successful at today's distance</li>
+                                                            <li>Racing at consistent 30-day intervals</li>
+                                                            <li>No equipment changes needed</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Comparisons Tab -->
+                        <div id="tab4" class="tab-pane">
+                            <div class="card">
+                                <div class="card-header">Comprehensive Comparisons</div>
+                                <div class="card-body">
+                                    <ul class="nav-tabs" id="comparison-tabs">
+                                        <li><a href="#" class="active" data-tab="factor-comp">Factor Comparison</a></li>
+                                        <li><a href="#" data-tab="jockey-comp">Jockey Analysis</a></li>
+                                        <li><a href="#" data-tab="trainer-comp">Trainer Analysis</a></li>
+                                        <li><a href="#" data-tab="pace-comp">Pace Scenario</a></li>
+                                    </ul>
+                                    
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="factor-comp">
+                                            <h4 style="font-size: 1rem; font-weight: 600; margin: 15px 0 10px;">All Horses Factor Comparison</h4>
+                                            
+                                            <div class="overflow-x-auto">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Horse</th>
+                                                            <th>Speed</th>
+                                                            <th>Class</th>
+                                                            <th>Form</th>
+                                                            <th>Pace</th>
+                                                            <th>Distance</th>
+                                                            <th>Track</th>
+                                                            <th>Connections</th>
+                                                            <th>Overall</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="font-weight-bold">Royal Flush</td>
+                                                            <td style="background-color: #d4edda;">87</td>
+                                                            <td style="background-color: #d4edda;">92</td>
+                                                            <td style="background-color: #d4edda;">85</td>
+                                                            <td>74</td>
+                                                            <td style="background-color: #d4edda;">87</td>
+                                                            <td style="background-color: #d4edda;">82</td>
+                                                            <td style="background-color: #d4edda;">89</td>
+                                                            <td class="font-weight-bold">85.7</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="font-weight-bold">Mountain King</td>
+                                                            <td style="background-color: #d4edda;">85</td>
+                                                            <td style="background-color: #d4edda;">80</td>
+                                                            <td>76</td>
+                                                            <td style="background-color: #d4edda;">88</td>
+                                                            <td>73</td>
+                                                            <td>75</td>
+                                                            <td style="background-color: #d4edda;">83</td>
+                                                            <td class="font-weight-bold">80.9</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="font-weight-bold">Speedy Thunder</td>
+                                                            <td>70</td>
+                                                            <td>76</td>
+                                                            <td style="background-color: #d4edda;">84</td>
+                                                            <td style="background-color: #d4edda;">92</td>
+                                                            <td>77</td>
+                                                            <td>79</td>
+                                                            <td>74</td>
+                                                            <td class="font-weight-bold">78.8</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="font-weight-bold">Lucky Star</td>
+                                                            <td>75</td>
+                                                            <td>68</td>
+                                                            <td>73</td>
+                                                            <td>76</td>
+                                                            <td style="background-color: #d4edda;">84</td>
+                                                            <td style="background-color: #d4edda;">81</td>
+                                                            <td>72</td>
+                                                            <td class="font-weight-bold">75.4</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="font-weight-bold">Night Runner</td>
+                                                            <td>65</td>
+                                                            <td>61</td>
+                                                            <td>64</td>
+                                                            <td>53</td>
+                                                            <td>67</td>
+                                                            <td>71</td>
+                                                            <td>68</td>
+                                                            <td class="font-weight-bold">64.1</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="font-weight-bold">Silver Streak</td>
+                                                            <td>57</td>
+                                                            <td>59</td>
+                                                            <td>61</td>
+                                                            <td>63</td>
+                                                            <td>59</td>
+                                                            <td>64</td>
+                                                            <td>62</td>
+                                                            <td class="font-weight-bold">60.7</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            
+                                            <div class="chart-container mt-3">
+                                                <div style="text-align: center; margin-bottom: 10px; font-weight: 600;">Radar Chart Comparison - Top 3 Horses</div>
+                                                <div class="mock-radar-chart">
+                                                    <div class="radar-web">
+                                                        <div class="radar-circle radar-circle-1"></div>
+                                                        <div class="radar-circle radar-circle-2"></div>
+                                                        <div class="radar-circle radar-circle-3"></div>
+                                                        <div class="radar-circle radar-circle-4"></div>
+                                                        
+                                                        <div class="radar-axis"></div>
+                                                        <div class="radar-axis"></div>
+                                                        <div class="radar-axis"></div>
+                                                        <div class="radar-axis"></div>
+                                                        <div class="radar-axis"></div>
+                                                        <div class="radar-axis"></div>
+                                                        <div class="radar-axis"></div>
+                                                        <div class="radar-axis"></div>
+                                                        
+                                                        <div class="radar-label label-0">Speed</div>
+                                                        <div class="radar-label label-1">Class</div>
+                                                        <div class="radar-label label-2">Form</div>
+                                                        <div class="radar-label label-3">Connections</div>
+                                                        <div class="radar-label label-4">Track</div>
+                                                        <div class="radar-label label-5">Distance</div>
+                                                        <div class="radar-label label-6">Pace</div>
+                                                        <div class="radar-label label-7">Equipment</div>
+                                                        
+                                                        <div class="radar-data radar-data-1"></div>
+                                                        <div class="radar-data radar-data-2"></div>
+                                                        <div class="radar-data radar-data-3"></div>
+                                                    </div>
+                                                </div>
+                                                <div style="display: flex; justify-content: center; margin-top: 10px;">
+                                                    <div style="margin: 0 10px; display: flex; align-items: center;">
+                                                        <div style="width: 12px; height: 12px; background-color: rgba(0, 116, 217, 0.5); margin-right: 5px;"></div>
+                                                        <span>Royal Flush</span>
+                                                    </div>
+                                                    <div style="margin: 0 10px; display: flex; align-items: center;">
+                                                        <div style="width: 12px; height: 12px; background-color: rgba(46, 204, 64, 0.5); margin-right: 5px;"></div>
+                                                        <span>Mountain King</span>
+                                                    </div>
+                                                    <div style="margin: 0 10px; display: flex; align-items: center;">
+                                                        <div style="width: 12px; height: 12px; background-color: rgba(255, 65, 54, 0.5); margin-right: 5px;"></div>
+                                                        <span>Speedy Thunder</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="tab-pane" id="jockey-comp">
+                                            <h4 style="font-size: 1rem; font-weight: 600; margin: 15px 0 10px;">Jockey Performance Analysis</h4>
+                                            
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Jockey</th>
+                                                        <th>Horse</th>
+                                                        <th>Win %</th>
+                                                        <th>ITM %</th>
+                                                        <th>ROI</th>
+                                                        <th>Track Win %</th>
+                                                        <th>Distance Win %</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>J. Smith</td>
+                                                        <td>Royal Flush</td>
+                                                        <td>28%</td>
+                                                        <td>67%</td>
+                                                        <td>+3.2%</td>
+                                                        <td>31%</td>
+                                                        <td>29%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>M. Johnson</td>
+                                                        <td>Mountain King</td>
+                                                        <td>22%</td>
+                                                        <td>61%</td>
+                                                        <td>-0.5%</td>
+                                                        <td>25%</td>
+                                                        <td>23%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>L. Williams</td>
+                                                        <td>Speedy Thunder</td>
+                                                        <td>19%</td>
+                                                        <td>54%</td>
+                                                        <td>+1.2%</td>
+                                                        <td>22%</td>
+                                                        <td>20%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>P. Rodriguez</td>
+                                                        <td>Lucky Star</td>
+                                                        <td>15%</td>
+                                                        <td>47%</td>
+                                                        <td>-2.1%</td>
+                                                        <td>18%</td>
+                                                        <td>14%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>T. Garcia</td>
+                                                        <td>Night Runner</td>
+                                                        <td>12%</td>
+                                                        <td>38%</td>
+                                                        <td>-4.5%</td>
+                                                        <td>11%</td>
+                                                        <td>13%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>R. Martinez</td>
+                                                        <td>Silver Streak</td>
+                                                        <td>9%</td>
+                                                        <td>32%</td>
+                                                        <td>-5.8%</td>
+                                                        <td>8%</td>
+                                                        <td>10%</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            
+                                            <div class="alert alert-info mt-3">
+                                                <strong>Jockey Insights:</strong> J. Smith has a strong history at Churchill Downs with a track win percentage 3% higher than his overall. M. Johnson shows consistent performance but slightly negative ROI, suggesting his mounts may be overbet.
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="tab-pane" id="trainer-comp">
+                                            <h4 style="font-size: 1rem; font-weight: 600; margin: 15px 0 10px;">Trainer Performance Analysis</h4>
+                                            
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Trainer</th>
+                                                        <th>Horse</th>
+                                                        <th>Win %</th>
+                                                        <th>Surface Win %</th>
+                                                        <th>Layoff Win %</th>
+                                                        <th>Last 30 Days</th>
+                                                        <th>Class Win %</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>A. Roberts</td>
+                                                        <td>Royal Flush</td>
+                                                        <td>24%</td>
+                                                        <td>26%</td>
+                                                        <td>22%</td>
+                                                        <td>7-3-2-10</td>
+                                                        <td>29%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>H. Wilson</td>
+                                                        <td>Mountain King</td>
+                                                        <td>21%</td>
+                                                        <td>25%</td>
+                                                        <td>18%</td>
+                                                        <td>5-4-3-14</td>
+                                                        <td>23%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>G. Thomas</td>
+                                                        <td>Speedy Thunder</td>
+                                                        <td>18%</td>
+                                                        <td>19%</td>
+                                                        <td>23%</td>
+                                                        <td>3-6-2-12</td>
+                                                        <td>16%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>K. Anderson</td>
+                                                        <td>Lucky Star</td>
+                                                        <td>16%</td>
+                                                        <td>12%</td>
+                                                        <td>19%</td>
+                                                        <td>2-3-5-11</td>
+                                                        <td>15%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>E. Martin</td>
+                                                        <td>Night Runner</td>
+                                                        <td>11%</td>
+                                                        <td>13%</td>
+                                                        <td>9%</td>
+                                                        <td>1-2-4-10</td>
+                                                        <td>8%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>S. Thompson</td>
+                                                        <td>Silver Streak</td>
+                                                        <td>8%</td>
+                                                        <td>7%</td>
+                                                        <td>10%</td>
+                                                        <td>0-1-3-12</td>
+                                                        <td>5%</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            
+                                            <div class="alert alert-info mt-3">
+                                                <strong>Trainer Insights:</strong> A. Roberts shows a strong 29% win rate at this class level, significantly above his overall statistics. G. Thomas has an excellent record with horses returning from layoffs, which could benefit Speedy Thunder.
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="tab-pane" id="pace-comp">
+                                            <h4 style="font-size: 1rem; font-weight: 600; margin: 15px 0 10px;">Pace Scenario Analysis</h4>
+                                            
+                                            <div class="grid-2">
+                                                <div>
+                                                    <table>
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Horse</th>
+                                                                <th>Running Style</th>
+                                                                <th>Early Speed</th>
+                                                                <th>Late Pace</th>
+                                                                <th>Energy Dist.</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Royal Flush</td>
+                                                                <td>Stalker/Presser</td>
+                                                                <td>74</td>
+                                                                <td>85</td>
+                                                                <td>Balanced</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Mountain King</td>
+                                                                <td>Presser</td>
+                                                                <td>82</td>
+                                                                <td>77</td>
+                                                                <td>Early</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Speedy Thunder</td>
+                                                                <td>Speed</td>
+                                                                <td>90</td>
+                                                                <td>62</td>
+                                                                <td>Very Early</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Lucky Star</td>
+                                                                <td>Closer</td>
+                                                                <td>55</td>
+                                                                <td>87</td>
+                                                                <td>Late</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Night Runner</td>
+                                                                <td>Deep Closer</td>
+                                                                <td>48</td>
+                                                                <td>78</td>
+                                                                <td>Very Late</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Silver Streak</td>
+                                                                <td>Stalker</td>
+                                                                <td>68</td>
+                                                                <td>73</td>
+                                                                <td>Balanced</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                
+                                                <div>
+                                                    <div class="card">
+                                                        <div class="card-header">Projected Pace Scenario</div>
+                                                        <div class="card-body">
+                                                            <div style="margin-bottom: 10px;">
+                                                                <div style="font-weight: 600;">Early Pace Pressure:</div>
+                                                                <div class="progress" style="height: 15px;">
+                                                                    <div class="progress-bar" style="width: 78%; background-color: #ff9800;"></div>
+                                                                </div>
+                                                                <div class="text-right">Moderate to High (78/100)</div>
+                                                            </div>
+                                                            
+                                                            <div style="margin-bottom: 10px;">
+                                                                <div style="font-weight: 600;">Projected Fractions:</div>
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <span>1/4 Mile: 22.8s</span>
+                                                                    <span>1/2 Mile: 46.1s</span>
+                                                                    <span>3/4 Mile: 1:10.5</span>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div style="margin-bottom: 10px;">
+                                                                <div style="font-weight: 600;">Pace Advantage:</div>
+                                                                <div>Strong advantage for stalkers and pressers with balanced energy distribution</div>
+                                                            </div>
+                                                            
+                                                            <div style="margin-bottom: 10px;">
+                                                                <div style="font-weight: 600;">Track Bias Impact:</div>
+                                                                <div>The current "No Bias" track condition favors horses with tactical speed</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="mt-3">
+                                                        <div class="race-track">
+                                                            <div class="finish-line"></div>
+                                                            <div class="horse-position" style="top: 40%; left: 70%; background-color: #0074d9;">1</div>
+                                                            <div class="horse-position" style="top: 30%; left: 64%; background-color: #2ecc40;">2</div>
+                                                            <div class="horse-position" style="top: 20%; left: 75%; background-color: #ff4136;">3</div>
+                                                            <div class="horse-position" style="top: 60%; left: 60%; background-color: #ffdc00;">4</div>
+                                                            <div class="horse-position" style="top: 80%; left: 55%; background-color: #b10dc9;">5</div>
+                                                            <div class="horse-position" style="top: 50%; left: 67%; background-color: #aaaaaa;">6</div>
+                                                        </div>
+                                                        <div style="text-align: center; font-size: 0.8rem;">Projected positions at mid-stretch</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Betting Calculator Tab -->
+                        <div id="tab5" class="tab-pane">
+                            <div class="card">
+                                <div class="card-header">Betting Value Calculator</div>
+                                <div class="card-body">
+                                    <div class="grid-2">
+                                        <div>
+                                            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 10px;">Win Bet Value</h4>
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Horse</th>
+                                                        <th>Win Prob.</th>
+                                                        <th>Morning Line</th>
+                                                        <th>Current Odds</th>
+                                                        <th>Fair Odds</th>
+                                                        <th>Value</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Royal Flush</td>
+                                                        <td>29.6%</td>
+                                                        <td>2-1</td>
+                                                        <td><input type="text" class="form-control" value="5-2" style="width: 60px;"></td>
+                                                        <td>2.4-1</td>
+                                                        <td><span class="badge badge-warning">Slight</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Mountain King</td>
+                                                        <td>24.3%</td>
+                                                        <td>3-1</td>
+                                                        <td><input type="text" class="form-control" value="7-2" style="width: 60px;"></td>
+                                                        <td>3.1-1</td>
+                                                        <td><span class="badge badge-warning">Slight</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Speedy Thunder</td>
+                                                        <td>19.8%</td>
+                                                        <td>4-1</td>
+                                                        <td><input type="text" class="form-control" value="3-1" style="width: 60px;"></td>
+                                                        <td>4.1-1</td>
+                                                        <td><span class="badge badge-success">Good</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Lucky Star</td>
+                                                        <td>15.4%</td>
+                                                        <td>6-1</td>
+                                                        <td><input type="text" class="form-control" value="8-1" style="width: 60px;"></td>
+                                                        <td>5.5-1</td>
+                                                        <td><span class="badge badge-success">Good</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Night Runner</td>
+                                                        <td>6.5%</td>
+                                                        <td>15-1</td>
+                                                        <td><input type="text" class="form-control" value="12-1" style="width: 60px;"></td>
+                                                        <td>14.4-1</td>
+                                                        <td><span class="badge badge-success">Good</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Silver Streak</td>
+                                                        <td>4.4%</td>
+                                                        <td>20-1</td>
+                                                        <td><input type="text" class="form-control" value="25-1" style="width: 60px;"></td>
+                                                        <td>21.7-1</td>
+                                                        <td><span class="badge badge-danger">Poor</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 10px;">Exotic Bet Calculator</h4>
+                                            
+                                            <div class="card" style="margin-bottom: 15px;">
+                                                <div class="card-header">Wager Type</div>
+                                                <div class="card-body">
+                                                    <div class="form-group">
+                                                        <label>Select Wager:</label>
+                                                        <select id="wager-type" class="form-control">
+                                                            <option>Win</option>
+                                                            <option>Place</option>
+                                                            <option>Show</option>
+                                                            <option selected>Exacta</option>
+                                                            <option>Trifecta</option>
+                                                            <option>Superfecta</option>
+                                                            <option>Daily Double</option>
+                                                            <option>Pick 3</option>
+                                                            <option>Pick 4</option>
+                                                            <option>Pick 5</option>
+                                                            <option>Pick 6</option>
+                                                        </select>
+                                                    </div>
+                                                    
+                                                    <div class="grid-2">
+                                                        <div class="form-group">
+                                                            <label>Wager Amount:</label>
+                                                            <input type="number" id="wager-amount" class="form-control" value="2" min="1" step="1">
+                                                        </div>
+                                                        
+                                                        <div class="form-group">
+                                                            <label>Ticket Structure:</label>
+                                                            <select id="ticket-structure" class="form-control">
+                                                                <option>Straight</option>
+                                                                <option selected>Box</option>
+                                                                <option>Key</option>
+                                                                <option>Wheel</option>
+                                                                <option>Part Wheel</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="checkbox-group">
+                                                        <div class="checkbox-item">
+                                                            <input type="checkbox" id="horse1" checked>
+                                                            <label for="horse1">Royal Flush</label>
+                                                        </div>
+                                                        <div class="checkbox-item">
+                                                            <input type="checkbox" id="horse2" checked>
+                                                            <label for="horse2">Mountain King</label>
+                                                        </div>
+                                                        <div class="checkbox-item">
+                                                            <input type="checkbox" id="horse3" checked>
+                                                            <label for="horse3">Speedy Thunder</label>
+                                                        </div>
+                                                        <div class="checkbox-item">
+                                                            <input type="checkbox" id="horse4">
+                                                            <label for="horse4">Lucky Star</label>
+                                                        </div>
+                                                        <div class="checkbox-item">
+                                                            <input type="checkbox" id="horse5">
+                                                            <label for="horse5">Night Runner</label>
+                                                        </div>
+                                                        <div class="checkbox-item">
+                                                            <input type="checkbox" id="horse6">
+                                                            <label for="horse6">Silver Streak</label>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <button class="btn btn-primary" style="width: 100%;">Calculate Ticket Cost & Probability</button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="card">
+                                                <div class="card-header">Wager Summary</div>
+                                                <div class="card-body">
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                                        <span style="font-weight: 600;">Wager Type:</span>
+                                                        <span>$2 Exacta Box</span>
+                                                    </div>
+                                                    
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                                        <span style="font-weight: 600;">Horses Used:</span>
+                                                        <span>3 horses (1, 2, 3)</span>
+                                                    </div>
+                                                    
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                                        <span style="font-weight: 600;">Total Combinations:</span>
+                                                        <span>6 combinations</span>
+                                                    </div>
+                                                    
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem; color: #0074d9;">
+                                                        <span style="font-weight: 600;">Total Cost:</span>
+                                                        <span>$12.00</span>
+                                                    </div>
+                                                    
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                                        <span style="font-weight: 600;">Collective Probability:</span>
+                                                        <span>54.1%</span>
+                                                    </div>
+                                                    
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                                        <span style="font-weight: 600;">Expected Payout:</span>
+                                                        <span>$35-45 range</span>
+                                                    </div>
+                                                    
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0px; font-size: 1.1rem;">
+                                                        <span style="font-weight: 600;">ROI Assessment:</span>
+                                                        <span class="text-success">Positive Value (+205%)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card mt-3">
+                                        <div class="card-header">Bankroll Management</div>
+                                        <div class="card-body">
+                                            <div class="grid-2">
+                                                <div>
+                                                    <div class="form-group">
+                                                        <label for="bankroll">Available Bankroll:</label>
+                                                        <input type="number" id="bankroll" class="form-control" value="200">
+                                                    </div>
+                                                    
+                                                    <div class="form-group">
+                                                        <label for="risk-tolerance">Risk Tolerance:</label>
+                                                        <select id="risk-tolerance" class="form-control">
+                                                            <option>Conservative (1-2%)</option>
+                                                            <option selected>Moderate (3-5%)</option>
+                                                            <option>Aggressive (6-10%)</option>
+                                                        </select>
+                                                    </div>
+                                                    
+                                                    <div class="form-group">
+                                                        <label for="allocation-strategy">Allocation Strategy:</label>
+                                                        <select id="allocation-strategy" class="form-control">
+                                                            <option>Equal Distribution</option>
+                                                            <option selected>Value-Based</option>
+                                                            <option>Kelly Criterion</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div>
+                                                    <h4 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 10px;">Recommended Wager Allocation</h4>
+                                                    <table>
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Wager Type</th>
+                                                                <th>Horses</th>
+                                                                <th>Amount</th>
+                                                                <th>Expected Value</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Win</td>
+                                                                <td>3 (Speedy Thunder)</td>
+                                                                <td>$20</td>
+                                                                <td class="text-success">+25%</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Win</td>
+                                                                <td>4 (Lucky Star)</td>
+                                                                <td>$10</td>
+                                                                <td class="text-success">+32%</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Exacta Box</td>
+                                                                <td>1,2,3</td>
+                                                                <td>$12</td>
+                                                                <td class="text-success">+205%</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Trifecta Key</td>
+                                                                <td>1 with 2,3,4</td>
+                                                                <td>$6</td>
+                                                                <td class="text-success">+180%</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                    
+                                                    <div style="margin-top: 10px; text-align: right; font-weight: 600;">
+                                                        <div>Total Wagered: $48</div>
+                                                        <div>Bankroll Percentage: 24%</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Actual Results Tab -->
+                        <div id="tab6" class="tab-pane">
+                            <div class="card">
+                                <div class="card-header">Record Actual Race Results</div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label>Enter Official Results (Position - Horse Number):</label>
+                                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                            <input type="number" class="form-control" placeholder="1st" min="1" max="6">
+                                            <input type="number" class="form-control" placeholder="2nd" min="1" max="6">
+                                            <input type="number" class="form-control" placeholder="3rd" min="1" max="6">
+                                            <input type="number" class="form-control" placeholder="4th" min="1" max="6">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Enter Final Odds:</label>
+                                        <div class="grid-2">
+                                            <div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 120px;">1. Royal Flush:</span>
+                                                    <input type="text" class="form-control" placeholder="Odds" style="width: 80px;">
+                                                </div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 120px;">2. Mountain King:</span>
+                                                    <input type="text" class="form-control" placeholder="Odds" style="width: 80px;">
+                                                </div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 120px;">3. Speedy Thunder:</span>
+                                                    <input type="text" class="form-control" placeholder="Odds" style="width: 80px;">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 120px;">4. Lucky Star:</span>
+                                                    <input type="text" class="form-control" placeholder="Odds" style="width: 80px;">
+                                                </div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 120px;">5. Night Runner:</span>
+                                                    <input type="text" class="form-control" placeholder="Odds" style="width: 80px;">
+                                                </div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 120px;">6. Silver Streak:</span>
+                                                    <input type="text" class="form-control" placeholder="Odds" style="width: 80px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Enter Payout Information:</label>
+                                        <div class="grid-2">
+                                            <div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 80px;">Win:</span>
+                                                    <input type="text" class="form-control" placeholder="$">
+                                                </div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 80px;">Place:</span>
+                                                    <input type="text" class="form-control" placeholder="$">
+                                                </div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 80px;">Show:</span>
+                                                    <input type="text" class="form-control" placeholder="$">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 80px;">Exacta:</span>
+                                                    <input type="text" class="form-control" placeholder="$">
+                                                </div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 80px;">Trifecta:</span>
+                                                    <input type="text" class="form-control" placeholder="$">
+                                                </div>
+                                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                                    <span style="width: 80px;">Superfecta:</span>
+                                                    <input type="text" class="form-control" placeholder="$">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-success" style="margin-right: 10px;">Save Results</button>
+                                    <button class="btn btn-primary">Compare to Predictions</button>
+                                    
+                                    <div class="mt-3">
+                                        <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 10px;">Model Performance Tracking</h4>
+                                        <div class="alert alert-info">
+                                            Enter race results to see performance metrics compared to predictions.
+                                        </div>
+                                        
+                                        <div style="display: none;">
+                                            <div class="grid-2">
+                                                <div>
+                                                    <div class="card">
+                                                        <div class="card-header">Win Prediction Accuracy</div>
+                                                        <div class="card-body text-center">
+                                                            <div style="font-size: 2rem; font-weight: 700; color: #0074d9;">38.2%</div>
+                                                            <div>12 of 31 winners correctly predicted</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div>
+                                                    <div class="card">
+                                                        <div class="card-header">ROI Performance</div>
+                                                        <div class="card-body text-center">
+                                                            <div style="font-size: 2rem; font-weight: 700; color: #2ecc40;">+12.7%</div>
+                                                            <div>$127 profit on $1,000 wagered</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="card mt-3">
+                                                <div class="card-header">Prediction vs. Actual Analysis</div>
+                                                <div class="card-body">
+                                                    <div style="margin-bottom: 10px;">
+                                                        <div style="font-weight: 600;">Model Strengths:</div>
+                                                        <ul style="margin-top: 5px; padding-left: 20px;">
+                                                            <li>65% accuracy identifying horses that finish in the money</li>
+                                                            <li>Strong performance on dirt routes (48% win accuracy)</li>
+                                                            <li>Excellent at identifying value plays (21.4% ROI)</li>
+                                                        </ul>
+                                                    </div>
+                                                    
+                                                    <div>
+                                                        <div style="font-weight: 600;">Areas for Improvement:</div>
+                                                        <ul style="margin-top: 5px; padding-left: 20px;">
+                                                            <li>Tends to underestimate late closers</li>
+                                                            <li>Struggles with wet track conditions (22% accuracy)</li>
+                                                            <li>Needs better adjustment for trainer patterns</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Basic tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            const tabLinks = document.querySelectorAll('.tab-link');
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links and panes
+                    tabLinks.forEach(l => l.classList.remove('active'));
+                    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                    
+                    // Add active class to current link and pane
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Handle comparison tab switching
+            const comparisonTabs = document.querySelectorAll('#comparison-tabs a');
+            const comparisonPanes = document.querySelectorAll('#tab4 .card-body > .tab-pane');
+            
+            comparisonTabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs and panes
+                    comparisonTabs.forEach(t => t.classList.remove('active'));
+                    comparisonPanes.forEach(p => p.classList.remove('active'));
+                    
+                    // Add active class to current tab and pane
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Slider input synchronization
+            const factorSliders = document.querySelectorAll('.factor-slider');
+            factorSliders.forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const factor = this.getAttribute('data-factor');
+                    const valueInput = document.querySelector(`.factor-value[data-factor="${factor}"]`);
+                    if (valueInput) {
+                        valueInput.value = this.value;
+                    }
+                });
+            });
+            
+            const factorValues = document.querySelectorAll('.factor-value');
+            factorValues.forEach(value => {
+                value.addEventListener('input', function() {
+                    const factor = this.getAttribute('data-factor');
+                    const slider = document.querySelector(`.factor-slider[data-factor="${factor}"]`);
+                    if (slider) {
+                        slider.value = this.value;
+                    }
+                });
+            });
+            
+            // Advanced random factors value display
+            const advFactors = document.querySelectorAll('.adv-factor');
+            advFactors.forEach(factor => {
+                factor.addEventListener('input', function() {
+                    const factorType = this.getAttribute('data-factor');
+                    const valueDisplay = document.getElementById(`${factorType}-value`);
+                    if (valueDisplay) {
+                        valueDisplay.textContent = `${Math.round(this.value * 100)}%`;
+                    }
+                });
+            });
+            
+            // Random factor sensitivity display
+            const randomFactor = document.getElementById('random-factor');
+            const randomFactorValue = document.getElementById('random-factor-value');
+            randomFactor.addEventListener('input', function() {
+                randomFactorValue.textContent = this.value;
+            });
+            
+            // Sample Data Button
+            const sampleBtn = document.getElementById('sampleBtn');
+            const dataStatus = document.getElementById('dataStatus');
+            sampleBtn.addEventListener('click', function() {
+                dataStatus.style.display = 'inline';
+            });
+            
+            // Run Simulation Button
+            const runSimBtn = document.getElementById('runSimBtn');
+            const simulationCount = document.getElementById('simulation-count');
+            const sensitivityValue = document.getElementById('sensitivity-value');
+            runSimBtn.addEventListener('click', function() {
+                const numSimulations = document.getElementById('num-simulations').value;
+                const randomFactorVal = document.getElementById('random-factor').value;
+                simulationCount.textContent = numSimulations;
+                sensitivityValue.textContent = randomFactorVal;
+            });
+        });
+    </script>
+</body>
+</html>
